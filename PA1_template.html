@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Loading and preprocessing the data</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>echo = TRUE</p>
+
+<h2>Loading and preprocessing the data</h2>
+
+<p>activity &lt;- read.csv(&ldquo;activity/activity.csv&rdquo;)</p>
+
+<p>head(activity)
+dim(activity)[1]
+names(activity)</p>
+
+<p>head(activity$date)</p>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<h2>1. Calculate the total number of steps taken per day</h2>
+
+<p>stepsByDay&lt;-aggregate(steps~date, activity, sum)</p>
+
+<h2>2. If you do not understand the difference between a histogram and a barplot,</h2>
+
+<h2>research the difference between them. Make a histogram of the total number</h2>
+
+<h2>of steps taken each day</h2>
+
+<p>hist(stepsByDay$steps, xlab=&ldquo;Steps&rdquo;, ylab=&ldquo;ays&rdquo;, main=&ldquo;Steps By Day&rdquo;)</p>
+
+<p>png(&ldquo;stepsByDay.png&rdquo;)
+hist(stepsByDay$steps, xlab=&ldquo;Steps&rdquo;, ylab=&ldquo;ays&rdquo;, main=&ldquo;Steps By Day&rdquo;)
+dev.off()</p>
+
+<h2>3. Calculate and report the mean and median of the total number of steps taken</h2>
+
+<h2>per day</h2>
+
+<p>myMean&lt;-mean(stepsByDay$steps)
+myMean
+#mean is 10766.19</p>
+
+<p>myMedian&lt;-median(stepsByDay$steps)
+myMedian 
+#median is 10765</p>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<h2>1. Make a time series plot (i.e. type = &ldquo;l&rdquo;) of the 5-minute</h2>
+
+<h2>interval (x-axis) and the average number of steps taken,</h2>
+
+<h2>averaged across all days (y-axis)</h2>
+
+<p>avgIntervals&lt;-aggregate(steps~interval, activity, mean)</p>
+
+<p>with(avgIntervals, plot(interval, steps, type = &ldquo;l&rdquo;))
+png(&ldquo;avgIntervals.png&rdquo;)
+with(avgIntervals, plot(interval, steps, type = &ldquo;l&rdquo;))
+dev.off()</p>
+
+<h2>2. Which 5-minute interval, on average across all the days</h2>
+
+<h2>in the dataset, contains the maximum number of steps?</h2>
+
+<p>avgIntervals[which.max(avgIntervals[,2]),1]</p>
+
+<h2>835</h2>
+
+<h2>Imputing missing values</h2>
+
+<h2>1. Calculate and report the total number of missing values in the</h2>
+
+<h2>dataset (i.e. the total number of rows with NAs)</h2>
+
+<p>missingValues &lt;- is.na(activity[,1])
+sum(missingValues)</p>
+
+<h2>2304 missing values</h2>
+
+<h2>2. Devise a strategy for filling in all of the missing values in</h2>
+
+<h2>the dataset. The strategy does not need to be sophisticated.</h2>
+
+<h2>For example, you could use the mean/median for that day,</h2>
+
+<h2>or the mean for that 5-minute interval, etc.</h2>
+
+<p>meanByDay &lt;- mean(avgIntervals$steps)
+meanByDay</p>
+
+<h2>3. Create a new dataset that is equal to the original dataset but</h2>
+
+<h2>with the missing data filled in.</h2>
+
+<p>activityNew&lt;-activity
+activityNew[missingValues,1]&lt;-meanByDay
+head(activityNew)</p>
+
+<h2>4. Make a histogram of the total number of steps taken each day</h2>
+
+<h2>and Calculate and report the mean and median total number of</h2>
+
+<h2>steps taken per day. Do these values differ from the estimates</h2>
+
+<h2>from the first part of the assignment? What is the impact of</h2>
+
+<h2>imputing missing data on the estimates of the total daily number</h2>
+
+<h2>of steps?</h2>
+
+<p>stepsByDayNew&lt;-aggregate(steps~date, activityNew, sum)</p>
+
+<p>hist(stepsByDayNew$steps, xlab=&ldquo;Steps&rdquo;, ylab=&ldquo;Days&rdquo;, main=&ldquo;Steps Per Day Using Mean By Day For Missing Values&rdquo;)
+png(&ldquo;stepsByDayNew.png&rdquo;)
+hist(stepsByDayNew$steps, xlab=&ldquo;Steps&rdquo;, ylab=&ldquo;Days&rdquo;, main=&ldquo;Steps Per Day Using Mean By Day For Missing Values&rdquo;)
+dev.off()</p>
+
+<p>newMean&lt;-mean(stepsByDayNew$steps)
+newMean
+##new mean is 10766.19</p>
+
+<p>newMedian&lt;-median(stepsByDayNew$steps)
+myMedian
+newMedian 
+##original median is 10765
+##new median is 10766.19</p>
+
+<h2>mean stays the same, but median changes</h2>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<h2>1. Create a new factor variable in the dataset with two</h2>
+
+<h2>levels – “weekday” and “weekend” indicating whether a</h2>
+
+<h2>given date is a weekday or weekend day.</h2>
+
+<p>activityNew$date &lt;- as.Date(activityNew$date)
+library(dplyr)</p>
+
+<p>activityNewer &lt;- activityNew%&gt;%
+        mutate(dayFlag= ifelse(weekdays(activityNew$date)==&ldquo;Saturday&rdquo; | weekdays(activityNew$date)==&ldquo;Sunday&rdquo;, &ldquo;Weekend&rdquo;, &ldquo;Weekday&rdquo;))
+head(activityNewer)</p>
+
+<h2>2. Make a panel plot containing a time series plot (i.e. type = &ldquo;l&rdquo;)</h2>
+
+<h2>of the 5-minute interval (x-axis) and the average number of steps</h2>
+
+<h2>taken, averaged across all weekday days or weekend days (y-axis).</h2>
+
+<h2>See the README file in the GitHub repository to see an example of</h2>
+
+<h2>what this plot should look like using simulated data.</h2>
+
+<p>avgStepsByDayFlag &lt;- activityNewer %&gt;%
+  group_by(dayFlag, interval) %&gt;%
+  summarize(avgStepsByDay=sum(steps))</p>
+
+<p>head(avgStepsByDayFlag)</p>
+
+<p>library(lattice)</p>
+
+<p>with(avgStepsByDayFlag, 
+      xyplot(avgStepsByDay ~ interval | dayFlag, 
+      type = &ldquo;l&rdquo;,<br/>
+      main = &ldquo;Steps By Day Flag and Interval&rdquo;,
+      xlab = &ldquo;Days&rdquo;,
+      ylab = &ldquo;Average Steps&rdquo;))</p>
+
+<p>png(&ldquo;avgStepsByDayFlag&rdquo;)
+with(avgStepsByDayFlag, 
+      xyplot(avgStepsByDay ~ interval | dayFlag, 
+      type = &ldquo;l&rdquo;,<br/>
+      main = &ldquo;Steps By Day Flag and Interval&rdquo;,
+      xlab = &ldquo;Days&rdquo;,
+      ylab = &ldquo;Average Steps&rdquo;))
+dev.off()</p>
+
+</body>
+
+</html>
